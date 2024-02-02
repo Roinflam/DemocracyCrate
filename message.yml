@@ -1,0 +1,70 @@
+ShowCrate: '&a你拥有抽奖箱 &6[crateName] &a！'
+TotalMoneyCrate: '&a你通过抽奖箱赚了&6[money]&a游戏币！'
+NoCrate: '&c你没有任何抽奖箱！'
+
+CreateLimit: '&c你无法创建更多抽奖箱！你最多可以创建[max]个！'
+CreateFail: '&c创建抽奖箱[crateName]失败！抽奖箱已存在！'
+CreateSuccess: '&a创建抽奖箱[crateName]成功！'
+
+NotFoundCrate: '&c没有名为[crateName]的抽奖箱！'
+NotTheOwner: '&c你不是这个抽奖箱的主人或者是服务器管理员！'
+SettingSuccess: '&a操作成功！'
+AddsSettingSuccess: '&a操作成功！成功添加[number]个物品进抽奖箱！'
+Enable: '&a成功设置[crateName]抽奖箱[enable]！'
+NotEnable: '&c当前抽奖箱未启用！无法抽奖，请联系抽奖箱所有者！'
+
+IntgerFormatError: '&c请输入大于等于0的整数！'
+
+EmptyHand: '&c不能为空手！'
+DoubleFormatError: '&c格式错误！请输入如同10%或者0.05%这种参数！概率也不能小于等于0！'
+
+Binding: '&a请右键一个方块把它变成抽奖箱！'
+Bind: '&a绑定目标为抽奖箱[crateName]成功！左键抽奖箱可查看抽奖箱内容！'
+DelBind: '&a成功拆除抽奖箱[crateName]！'
+MaxBind: '&c你最多只能同时绑定[number]个方块！'
+
+EmptyCrate: '&c这个抽奖箱是空的，你无法抽取！'
+InsufficientItem: '&c抽奖箱所剩内容不足，里面只有[number]个物品了！'
+
+Timeout: '&c操作超时，已结束抽奖！'
+DrawNumber: '&a你想抽多少次？请输入一个大于0的整数！'
+MaxDrawNumber: '&c一次最多抽奖不能超过[max]次！'
+LackMoney: '&c本次抽奖需要[spend]游戏币，你只有[money]游戏币！'
+
+NotWin: '&c真倒霉...你什么都没抽到！'
+DrawItem: '&a你抽奖[number]次获得了以下物品 &f&l[item]'
+RareDrawItem: '&a恭喜玩家&4&l[player]&a在[owner]的&6&l[crate]&a抽奖箱中抽出了概率为&4&l[random]&a的&6超稀有物品 &6&l[item]&a ！'
+GiveMoney: '&a玩家[player]在你的&6[crateName]&a抽奖箱抽了[number]发，去掉税后你赚了[money]游戏币！'
+
+PermissionDenied: '&c你无法使用此指令！'
+
+Title: '&a玩家&l[owner]&a的&f&l[crateName]&a抽奖箱'
+
+HelpName: '&b介绍'
+HelpLore:
+  - '&3看看这个抽奖箱能抽到什么东西吧！'
+
+LastName: '&6翻到上一页'
+LastLore: [ ]
+
+NextName: '&6翻到下一页'
+NextLore: [ ]
+
+ShowLore: '&f&l此物品有&6&l[probability]&f&l概率可抽中！'
+
+SupplementaryGoodsSuccess: '&a补充货物成功！'
+SupplementaryGoodsFail: '&c这个物品无法补货，或许是奖池没有对应能补充的物品？'
+
+HolographicDisplays:
+  - '&a[owner]的抽奖箱&6[crateName]~'
+  - '&a抽奖价格为&6[money]&a游戏币/次'
+  - '&a左键查看内容 | 右键开始抽奖'
+
+ReplenishmentTitle: '&a批量补货&6[crateName]&a抽奖箱'
+
+ReplenishmentSuccess: '&a[item]物品成功补货到&6[crateName]&a抽奖箱！'
+ReplenishmentFail: '&c[item]无法补货到[crateName]抽奖箱，或许是奖池没有对应能补充的物品？'
+
+AddsTitle: '&a批量上架&6[crateName]&a抽奖箱'
+
+MaxSize: '&c无法继续添加物品！已到达上上限[max]种物品！'
