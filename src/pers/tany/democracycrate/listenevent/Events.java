@@ -11,7 +11,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import pers.tany.democracycrate.Main;
@@ -55,11 +54,8 @@ public class Events implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onPlayerInteract(PlayerInteractEvent evt) {
-        if (evt.isCancelled()) {
-            return;
-        }
 //        if (evt.getHand() != null && evt.getHand().equals(EquipmentSlot.OFF_HAND)) {
 //            return;
 //        }
@@ -70,12 +66,19 @@ public class Events implements Listener {
             Location location = block.getLocation();
             if (evt.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                 if (Commands.bindMap.containsKey(evt.getPlayer().getName())) {
-                    if (CrateUtil.getBindCrateNumber(Commands.bindMap.get(name)) >= Main.config.getInt("MaxBind")) {
-                        player.sendMessage(IString.color(Main.message.getString("MaxBind").replace("[number]", Main.config.getInt("MaxBind") + "")));
+                    if (evt.isCancelled()) {
+                        return;
+                    }
+                    if (Main.config.getStringList("BlackBind").contains(location.getWorld().getName())) {
+                        player.sendMessage(IString.color(Main.message.getString("NoBind")));
                     } else {
-                        CrateUtil.addLocation(location, Commands.bindMap.get(name));
-                        HologramUtil.addHologram(location);
-                        player.sendMessage(IString.color(Main.message.getString("Bind").replace("[crateName]", Commands.bindMap.get(name))));
+                        if (CrateUtil.getBindCrateNumber(Commands.bindMap.get(name)) >= Main.config.getInt("MaxBind")) {
+                            player.sendMessage(IString.color(Main.message.getString("MaxBind").replace("[number]", Main.config.getInt("MaxBind") + "")));
+                        } else {
+                            CrateUtil.addLocation(location, Commands.bindMap.get(name));
+                            HologramUtil.addHologram(location);
+                            player.sendMessage(IString.color(Main.message.getString("Bind").replace("[crateName]", Commands.bindMap.get(name))));
+                        }
                     }
                     evt.setCancelled(true);
                     Commands.bindMap.remove(name);
@@ -169,7 +172,7 @@ public class Events implements Listener {
 
                                                     }.runTask(Main.plugin);
                                                     if (Double.parseDouble(probability.replace("%", "")) <= Double.parseDouble(Main.config.getString("RaryProbability").replace("%", ""))) {
-                                                        Bukkit.broadcastMessage(IString.color(Main.message.getString("RareDrawItem").replace("[player]", player.getName()).replace("[owner]", owner).replace("[crate]", crateName).replace("[item]", IItem.getName(giveItemStack)).replace("[random]",probability)));
+                                                        Bukkit.broadcastMessage(IString.color(Main.message.getString("RareDrawItem").replace("[player]", player.getName()).replace("[owner]", owner).replace("[crate]", crateName).replace("[item]", IItem.getName(giveItemStack)).replace("[random]", probability)));
                                                     } else {
                                                         itemName += IItem.getName(giveItemStack) + " ";
                                                     }

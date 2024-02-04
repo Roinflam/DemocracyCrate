@@ -21,6 +21,14 @@ Timeout: 5
 #最多一个抽奖箱同时绑定...个方块
 MaxBind: 1
 
+#禁止指定世界绑定箱子
+BlackBind:
+  - '世界名字'
+
+#禁止指定type的物品加到抽奖箱
+BlackType:
+  - 'STONE'
+
 #每次抽奖的税
 #dc.tax是免税权限
 Tax: 0.13

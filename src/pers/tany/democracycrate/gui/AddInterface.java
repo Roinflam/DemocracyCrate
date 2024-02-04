@@ -58,6 +58,10 @@ public class AddInterface implements InventoryHolder, Listener {
                         break;
                     }
                     if (!IItem.isEmpty(addItemStack)) {
+                        if (Main.config.getStringList("BlackType").contains(addItemStack.getType().toString())) {
+                            player.sendMessage(IString.color(Main.message.getString("NoAdd")));
+                            continue;
+                        }
                         CrateUtil.addItem(crateName, ItemUtil.getItemData(addItemStack) + ":" + probability);
                         number++;
                     }

@@ -1,6 +1,8 @@
 ShowCrate: '&a你拥有抽奖箱 &6[crateName] &a！'
 TotalMoneyCrate: '&a你通过抽奖箱赚了&6[money]&a游戏币！'
 NoCrate: '&c你没有任何抽奖箱！'
+NoBind: '&c禁止在这个世界绑定！'
+NoAdd: '&c此物品禁止添加到抽奖箱！'
 
 CreateLimit: '&c你无法创建更多抽奖箱！你最多可以创建[max]个！'
 CreateFail: '&c创建抽奖箱[crateName]失败！抽奖箱已存在！'

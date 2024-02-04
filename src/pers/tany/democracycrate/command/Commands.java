@@ -268,6 +268,10 @@ public class Commands implements CommandExecutor {
                     return true;
                 }
                 ItemStack itemStack = player.getItemInHand();
+                if(Main.config.getStringList("BlackType").contains(itemStack.getType().toString())){
+                    player.sendMessage(IString.color(Main.message.getString("NoAdd")));
+                    return true;
+                }
                 CrateUtil.addItem(crateName, ItemUtil.getItemData(itemStack) + ":" + args[2]);
                 player.setItemInHand(null);
                 player.sendMessage(IString.color(Main.message.getString("SettingSuccess")));
