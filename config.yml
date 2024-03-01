@@ -11,6 +11,8 @@ MaxSize: 90
 
 #一次最多抽奖多少次？
 MaxDrawNumber: 250
+#是否在物品不足时开启超上限抽奖（如只剩一个物品，概率0.01%，不开启的话一次只能抽一发（抽奖箱物品数量上限））
+ReturnItem: true
 
 #当抽中概率设置...及以下的物品发出公告
 RaryProbability: 0.01%
@@ -23,11 +25,19 @@ MaxBind: 1
 
 #禁止指定世界绑定箱子
 BlackBind:
-  - '世界名字'
+  - 'zc'
+  - 'fb'
 
 #禁止指定type的物品加到抽奖箱
 BlackType:
   - 'STONE'
+
+#禁止指定lore的物品添加到抽奖箱
+BlackLore:
+  - '绑定物品'
+
+#指定type的方块才能绑定抽奖箱（不填为不启用）
+BindWhiteType: [ ]
 
 #每次抽奖的税
 #dc.tax是免税权限

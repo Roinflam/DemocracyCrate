@@ -3,6 +3,7 @@ TotalMoneyCrate: '&a你通过抽奖箱赚了&6[money]&a游戏币！'
 NoCrate: '&c你没有任何抽奖箱！'
 NoBind: '&c禁止在这个世界绑定！'
 NoAdd: '&c此物品禁止添加到抽奖箱！'
+NoBindType: '&c此方块禁止绑定为抽奖箱！'
 
 CreateLimit: '&c你无法创建更多抽奖箱！你最多可以创建[max]个！'
 CreateFail: '&c创建抽奖箱[crateName]失败！抽奖箱已存在！'
@@ -27,6 +28,7 @@ MaxBind: '&c你最多只能同时绑定[number]个方块！'
 
 EmptyCrate: '&c这个抽奖箱是空的，你无法抽取！'
 InsufficientItem: '&c抽奖箱所剩内容不足，里面只有[number]个物品了！'
+ReturnItem: '&c已经抽空此抽奖箱了，剩下其余[number]发抽奖自动落空！'
 
 Timeout: '&c操作超时，已结束抽奖！'
 DrawNumber: '&a你想抽多少次？请输入一个大于0的整数！'

@@ -69,6 +69,12 @@ public class Events implements Listener {
                     if (evt.isCancelled()) {
                         return;
                     }
+                    if (Main.config.getStringList("BindWhiteType").size() > 0) {
+                        if (!Main.config.getStringList("BindWhiteType").contains(block.getType().toString())) {
+                            player.sendMessage(IString.color(Main.message.getString("NoBindType")));
+                            return;
+                        }
+                    }
                     if (Main.config.getStringList("BlackBind").contains(location.getWorld().getName())) {
                         player.sendMessage(IString.color(Main.message.getString("NoBind")));
                     } else {
@@ -127,10 +133,11 @@ public class Events implements Listener {
                                         if (itemAmount < number) {
                                             if (itemAmount == 0) {
                                                 player.sendMessage(IString.color(Main.message.getString("EmptyCrate")));
-                                            } else {
+                                                return;
+                                            } else if (!Main.config.getBoolean("ReturnItem")) {
                                                 player.sendMessage(IString.color(Main.message.getString("InsufficientItem").replace("[number]", itemAmount + "")));
+                                                return;
                                             }
-                                            return;
                                         }
                                         int spendMoney = CrateUtil.getMoney(crateName) * number;
                                         if (Main.economy.getBalance(player.getName()) < spendMoney) {
@@ -155,6 +162,10 @@ public class Events implements Listener {
                                         String itemName = "";
                                         for (int i = 0; i < number; i++) {
                                             List<String> itemList = IList.upsetList(CrateUtil.getItemList(crateName));
+                                            if (itemList.size() <= 0) {
+                                                player.sendMessage(IString.color(Main.message.getString("ReturnItem").replace("[number]", (number - i) + "")));
+                                                break;
+                                            }
                                             for (int index = 0; index < itemList.size(); index++) {
                                                 String itemInfo = itemList.get(index);
                                                 ItemStack itemStack = ItemUtil.getItemStack(itemInfo.split(":")[0]);

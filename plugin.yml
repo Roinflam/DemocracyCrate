@@ -1,6 +1,6 @@
 name: DemocracyCrate
 main: pers.tany.democracycrate.Main
-version: 1.0.1
+version: 1.0.3
 author: tany
 description: 玩家自主创建抽奖箱
 depend: [ YukiNoaAPI,HolographicDisplays, ]
