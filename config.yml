@@ -42,3 +42,6 @@ BindWhiteType: [ ]
 #每次抽奖的税
 #dc.tax是免税权限
 Tax: 0.13
+
+#是否开启日志记录
+Log: true

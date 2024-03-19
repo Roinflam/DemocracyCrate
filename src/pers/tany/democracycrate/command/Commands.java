@@ -11,15 +11,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import pers.tany.democracycrate.Main;
 import pers.tany.democracycrate.gui.AddInterface;
+import pers.tany.democracycrate.gui.GuaranteedAddInterface;
 import pers.tany.democracycrate.gui.ReplenishmentInterface;
 import pers.tany.democracycrate.utils.CrateUtil;
 import pers.tany.democracycrate.utils.HologramUtil;
-import pers.tany.democracycrate.utils.ItemUtil;
 import pers.tany.yukinoaapi.interfacepart.configuration.IConfig;
 import pers.tany.yukinoaapi.interfacepart.inventory.IInventory;
 import pers.tany.yukinoaapi.interfacepart.item.IItem;
 import pers.tany.yukinoaapi.interfacepart.other.IString;
 import pers.tany.yukinoaapi.interfacepart.player.IPlayer;
+import pers.tany.yukinoaapi.interfacepart.serializer.ISerializer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,12 +41,36 @@ public class Commands implements CommandExecutor {
                 Main.config = YamlConfiguration.loadConfiguration(new File(Main.plugin.getDataFolder(), "config.yml"));
                 Main.data = YamlConfiguration.loadConfiguration(new File(Main.plugin.getDataFolder(), "data.yml"));
                 Main.message = YamlConfiguration.loadConfiguration(new File(Main.plugin.getDataFolder(), "message.yml"));
+                Main.log = YamlConfiguration.loadConfiguration(new File(Main.plugin.getDataFolder(), "log.yml"));
                 HologramUtil.update();
                 sender.sendMessage("§a重载成功");
                 return true;
             }
         }
+        if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("check")) {
+                String crateName = CrateUtil.getFormattedName(args[1]);
+                if (!CrateUtil.hasCrate(crateName)) {
+                    sender.sendMessage(IString.color(Main.message.getString("NotFoundCrate").replace("[crateName]", crateName)));
+                    return true;
+                }
+//                if (!CrateUtil.getOwner(crateName).equals(sender.getName()) && !sender.isOp()) {
+//                    sender.sendMessage(IString.color(Main.message.getString("NotTheOwner")));
+//                    return true;
+//                }
+                List<String> resultLog = Main.log.getStringList("ResultLog." + crateName);
+                if (resultLog.size() <= 0) {
+                    sender.sendMessage(IString.color(Main.message.getString("NotFoundLog")));
+                    return true;
+                }
+                for (int i = resultLog.size() - 1; i >= 0; i--) {
+                    sender.sendMessage("§f" + resultLog.get(i));
+                }
+                return true;
+            }
+        }
         if (sender instanceof ConsoleCommandSender) {
+            sender.sendMessage("§a/dc check 抽奖箱名  §2查看指定抽奖箱的抽奖情况");
             sender.sendMessage("§a/dc reload  §2重载配置文件");
             return true;
         }
@@ -64,10 +89,65 @@ public class Commands implements CommandExecutor {
                     player.sendMessage(IString.color(Main.message.getString("NoCrate")));
                 }
                 player.sendMessage(IString.color(Main.message.getString("TotalMoneyCrate").replace("[money]", Main.data.getInt("TotalMoney." + name) + "")));
+                if (Main.data.getConfigurationSection("Guaranteed." + player.getName()) != null) {
+                    for (String crateName : Main.data.getConfigurationSection("Guaranteed." + player.getName()).getKeys(false)) {
+                        int guaranteed = CrateUtil.getGuaranteed(crateName);
+                        int number = CrateUtil.getLotteryNumber(crateName, player.getName());
+                        String owner = CrateUtil.getOwner(crateName);
+                        player.sendMessage(IString.color(Main.message.getString("LotteryNumber").replace("[owner]", owner).replace("[number]", number + "").replace("[crateName]", crateName).replace("[guaranteed]", guaranteed + "").replace("[surplus]", guaranteed - number + "")));
+                    }
+                }
                 return true;
             }
         }
         if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("gadd")) {
+                if (IItem.isEmptyHand(player)) {
+                    player.sendMessage(IString.color(Main.message.getString("EmptyHand")));
+                    return true;
+                }
+                String crateName = CrateUtil.getFormattedName(args[1]);
+                if (!CrateUtil.hasCrate(crateName)) {
+                    player.sendMessage(IString.color(Main.message.getString("NotFoundCrate").replace("[crateName]", crateName)));
+                    return true;
+                }
+                if (!CrateUtil.getOwner(crateName).equals(name) && !player.isOp()) {
+                    player.sendMessage(IString.color(Main.message.getString("NotTheOwner")));
+                    return true;
+                }
+                ItemStack itemStack = player.getItemInHand();
+                if (Main.config.getStringList("BlackType").contains(itemStack.getType().toString())) {
+                    player.sendMessage(IString.color(Main.message.getString("NoAdd")));
+                    return true;
+                }
+                if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasLore()) {
+                    for (String lore : itemStack.getItemMeta().getLore()) {
+                        for (String l : Main.config.getStringList("BlackLore")) {
+                            if (lore.contains(l)) {
+                                player.sendMessage(IString.color(Main.message.getString("NoAdd")));
+                                return true;
+                            }
+                        }
+                    }
+                }
+                CrateUtil.addGuaranteedItem(crateName, ISerializer.serializerItemStack(itemStack));
+                player.setItemInHand(null);
+                player.sendMessage(IString.color(Main.message.getString("SettingSuccess")));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("gadds")) {
+                String crateName = CrateUtil.getFormattedName(args[1]);
+                if (!CrateUtil.hasCrate(crateName)) {
+                    player.sendMessage(IString.color(Main.message.getString("NotFoundCrate").replace("[crateName]", crateName)));
+                    return true;
+                }
+                if (!CrateUtil.getOwner(crateName).equals(name) && !player.isOp()) {
+                    player.sendMessage(IString.color(Main.message.getString("NotTheOwner")));
+                    return true;
+                }
+                IInventory.openInventory(new GuaranteedAddInterface(crateName, player), player);
+                return true;
+            }
             if (args[0].equalsIgnoreCase("create")) {
                 int maxCreateNumber = Main.config.getInt("MaxCreateNumber");
                 for (PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()) {
@@ -104,7 +184,16 @@ public class Commands implements CommandExecutor {
                     return true;
                 }
                 for (String itemInfo : CrateUtil.getItemList(crateName)) {
-                    ItemStack itemStack = ItemUtil.getItemStack(itemInfo.split(":")[0]);
+                    try {
+                        ItemStack itemStack = ISerializer.deserializeItemStack(itemInfo.split(":")[0]);
+                        IPlayer.giveItem(player, itemStack);
+                    } catch (Exception e) {
+                        ItemStack itemStack = ISerializer.deserializeItemStack(itemInfo);
+                        IPlayer.giveItem(player, itemStack);
+                    }
+                }
+                for (String itemInfo : CrateUtil.getGuaranteedItemList(crateName)) {
+                    ItemStack itemStack = ISerializer.deserializeItemStack(itemInfo);
                     IPlayer.giveItem(player, itemStack);
                 }
                 CrateUtil.removeCrate(crateName);
@@ -169,7 +258,7 @@ public class Commands implements CommandExecutor {
                 List<String> itemList = CrateUtil.getItemList(crateName);
                 for (int index = 0; index < itemList.size(); index++) {
                     String itemInfo = itemList.get(index);
-                    ItemStack itemStack = ItemUtil.getItemStack(itemInfo.split(":")[0]);
+                    ItemStack itemStack = ISerializer.deserializeItemStack(itemInfo.split(":")[0]);
                     if (itemStack.isSimilar(addItemStack)) {
                         if (itemStack.getAmount() >= itemStack.getMaxStackSize()) {
                             continue;
@@ -183,7 +272,7 @@ public class Commands implements CommandExecutor {
                             player.setItemInHand(null);
                         }
                         String probability = itemInfo.split(":")[1];
-                        itemList.set(index, ItemUtil.getItemData(itemStack) + ":" + probability);
+                        itemList.set(index, ISerializer.serializerItemStack(itemStack) + ":" + probability);
                         break;
                     }
                 }
@@ -210,6 +299,28 @@ public class Commands implements CommandExecutor {
             }
         }
         if (args.length == 3) {
+            if (args[0].equalsIgnoreCase("g")) {
+                String crateName = CrateUtil.getFormattedName(args[1]);
+                if (!CrateUtil.hasCrate(crateName)) {
+                    player.sendMessage(IString.color(Main.message.getString("NotFoundCrate").replace("[crateName]", crateName)));
+                    return true;
+                }
+                if (!CrateUtil.getOwner(crateName).equals(name) && !player.isOp()) {
+                    player.sendMessage(IString.color(Main.message.getString("NotTheOwner")));
+                    return true;
+                }
+                int number = 0;
+                try {
+                    number = Integer.parseInt(args[2]);
+                } catch (NumberFormatException e) {
+                    player.sendMessage(IString.color(Main.message.getString("IntgerFormatError")));
+                    return true;
+                }
+                CrateUtil.setGuaranteed(crateName, number);
+                player.sendMessage(IString.color(Main.message.getString("SettingSuccess")));
+                HologramUtil.update();
+                return true;
+            }
             if (args[0].equalsIgnoreCase("money")) {
                 String crateName = CrateUtil.getFormattedName(args[1]);
                 if (!CrateUtil.hasCrate(crateName)) {
@@ -282,7 +393,7 @@ public class Commands implements CommandExecutor {
                         }
                     }
                 }
-                CrateUtil.addItem(crateName, ItemUtil.getItemData(itemStack) + ":" + args[2]);
+                CrateUtil.addItem(crateName, ISerializer.serializerItemStack(itemStack) + ":" + args[2]);
                 player.setItemInHand(null);
                 player.sendMessage(IString.color(Main.message.getString("SettingSuccess")));
                 return true;
@@ -317,24 +428,32 @@ public class Commands implements CommandExecutor {
         }
         if (sender.isOp()) {
             sender.sendMessage("§a/dc show  §2查看自己所有抽奖箱和收益情况");
+            sender.sendMessage("§a/dc check 抽奖箱名  §2查看指定抽奖箱的抽奖情况");
             sender.sendMessage("§a/dc create 抽奖箱名  §2创建一个新的抽奖箱");
             sender.sendMessage("§a/dc bind 抽奖箱名  §2绑定方块为抽奖箱");
             sender.sendMessage("§a/dc enable 抽奖箱名  §2启动和关闭抽奖箱");
             sender.sendMessage("§a/dc money 抽奖箱名 游戏币  §2设置这个抽奖箱所需要的游戏币");
+            sender.sendMessage("§a/dc gadd 抽奖箱名  §2把这个物品添加到抽奖箱的保底里");
+            sender.sendMessage("§a/dc gadds 抽奖箱名  §2打开批量添加抽奖保底奖励界面");
             sender.sendMessage("§a/dc add 抽奖箱名 概率  §2把这个物品添加到抽奖箱里，概率为10%就填10%");
             sender.sendMessage("§a/dc adds 抽奖箱名 概率  §2打开批量添加抽奖奖励界面");
+            sender.sendMessage("§a/dc g 抽奖箱名 保底次数  §2设置这个抽奖箱保底次数");
             sender.sendMessage("§a/dc sg 抽奖箱名  §2补充手上的货物到抽奖箱");
             sender.sendMessage("§a/dc sgs 抽奖箱名  §2打开批量补充货物界面");
             sender.sendMessage("§a/dc remove 抽奖箱  §2删除抽奖箱，里面的物品都会回到背包");
             sender.sendMessage("§a/dc reload  §2重载配置文件");
         } else {
             sender.sendMessage("§a/dc show  §2查看自己所有抽奖箱和收益情况");
+            sender.sendMessage("§a/dc check 抽奖箱名  §2查看指定抽奖箱的抽奖情况");
             sender.sendMessage("§a/dc create 抽奖箱名  §2创建一个新的抽奖箱");
             sender.sendMessage("§a/dc bind 抽奖箱名  §2绑定方块为抽奖箱");
             sender.sendMessage("§a/dc enable 抽奖箱名  §2启动和关闭抽奖箱");
             sender.sendMessage("§a/dc money 抽奖箱名 游戏币  §2设置这个抽奖箱所需要的游戏币");
+            sender.sendMessage("§a/dc gadd 抽奖箱名  §2把这个物品添加到抽奖箱的保底里");
+            sender.sendMessage("§a/dc gadds 抽奖箱名  §2打开批量添加抽奖保底奖励界面");
             sender.sendMessage("§a/dc add 抽奖箱名 概率  §2把这个物品添加到抽奖箱里，概率为10%就填10%");
             sender.sendMessage("§a/dc adds 抽奖箱名 概率  §2打开批量添加抽奖奖励界面");
+            sender.sendMessage("§a/dc g 抽奖箱名 保底次数  §2设置这个抽奖箱保底次数");
             sender.sendMessage("§a/dc sg 抽奖箱名  §2补充手上的货物到抽奖箱");
             sender.sendMessage("§a/dc sgs 抽奖箱名  §2打开批量补充货物界面");
             sender.sendMessage("§a/dc remove 抽奖箱  §2删除抽奖箱，里面的物品都会回到背包");

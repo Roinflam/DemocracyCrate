@@ -19,7 +19,7 @@ public class HologramUtil {
 
             Hologram hologram = HologramsAPI.createHologram(Main.plugin, newLocation);
             for (String text : Main.message.getStringList("HolographicDisplays")) {
-                hologram.appendTextLine(IString.color(text.replace("[crateName]", crateName).replace("[owner]", CrateUtil.getOwner(crateName)).replace("[money]", CrateUtil.getMoney(crateName) + "")));
+                hologram.appendTextLine(IString.color(text.replace("[crateName]", crateName).replace("[owner]", CrateUtil.getOwner(crateName)).replace("[money]", CrateUtil.getMoney(crateName) + "").replace("[number]",CrateUtil.getGuaranteed(crateName)+"")));
             }
             Main.holographicList.put(ISerializer.serializerLocation(location), hologram);
         }

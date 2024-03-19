@@ -16,18 +16,16 @@ import pers.tany.yukinoaapi.interfacepart.other.IRandom;
 import pers.tany.yukinoaapi.interfacepart.other.IString;
 import pers.tany.yukinoaapi.interfacepart.serializer.ISerializer;
 
-public class AddInterface implements InventoryHolder, Listener {
+public class GuaranteedAddInterface implements InventoryHolder, Listener {
     private final String serial;
     private final Inventory inventory;
     private final String crateName;
-    private final String probability;
     private final Player player;
 
-    public AddInterface(String crateName, Player player, String probability) {
+    public GuaranteedAddInterface(String crateName, Player player) {
 
         this.crateName = crateName;
         this.player = player;
-        this.probability = probability;
         this.inventory = Bukkit.createInventory(this, 54, IString.color(Main.message.getString("AddsTitle").replace("[crateName]", crateName)));
         this.serial = IRandom.createRandomString(8);
 
@@ -46,17 +44,13 @@ public class AddInterface implements InventoryHolder, Listener {
 
     @EventHandler
     private void onInventoryClose(InventoryCloseEvent evt) {
-        if (evt.getInventory().getHolder() instanceof AddInterface && evt.getPlayer() instanceof Player) {
-            AddInterface replenishmentInterface = (AddInterface) evt.getInventory().getHolder();
+        if (evt.getInventory().getHolder() instanceof GuaranteedAddInterface && evt.getPlayer() instanceof Player) {
+            GuaranteedAddInterface replenishmentInterface = (GuaranteedAddInterface) evt.getInventory().getHolder();
             if (evt.getPlayer().equals(player) && replenishmentInterface.getSerial().equals(serial)) {
                 HandlerList.unregisterAll(this);
                 int number = 0;
                 for (int i = 0; i < 54; i++) {
                     ItemStack addItemStack = inventory.getItem(i);
-                    if (CrateUtil.getItemList(crateName).size() >= Main.config.getInt("MaxSize")) {
-                        player.sendMessage(IString.color(Main.message.getString("MaxSize").replace("[max]", Main.config.getInt("MaxSize") + "")));
-                        break;
-                    }
                     if (!IItem.isEmpty(addItemStack)) {
                         if (Main.config.getStringList("BlackType").contains(addItemStack.getType().toString())) {
                             player.sendMessage(IString.color(Main.message.getString("NoAdd")));
@@ -76,11 +70,11 @@ public class AddInterface implements InventoryHolder, Listener {
                         if(noAdd){
                             player.sendMessage(IString.color(Main.message.getString("NoAdd")));
                         }
-                        CrateUtil.addItem(crateName, ISerializer.serializerItemStack(addItemStack) + ":" + probability);
+                        CrateUtil.addGuaranteedItem(crateName, ISerializer.serializerItemStack(addItemStack));
                         number++;
                     }
                 }
-                player.sendMessage(IString.color(Main.message.getString("AddsSettingSuccess").replace("[number]", number + "")));
+                player.sendMessage(IString.color(Main.message.getString("GuaranteedAddsSettingSuccess").replace("[number]", number + "")));
             }
         }
     }

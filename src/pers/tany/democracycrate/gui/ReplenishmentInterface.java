@@ -11,11 +11,11 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import pers.tany.democracycrate.Main;
 import pers.tany.democracycrate.utils.CrateUtil;
-import pers.tany.democracycrate.utils.ItemUtil;
 import pers.tany.yukinoaapi.interfacepart.item.IItem;
 import pers.tany.yukinoaapi.interfacepart.other.IRandom;
 import pers.tany.yukinoaapi.interfacepart.other.IString;
 import pers.tany.yukinoaapi.interfacepart.player.IPlayer;
+import pers.tany.yukinoaapi.interfacepart.serializer.ISerializer;
 
 import java.util.List;
 
@@ -59,7 +59,7 @@ public class ReplenishmentInterface implements InventoryHolder, Listener {
                         String itemName = IItem.getName(addItemStack);
                         for (int index = 0; index < itemList.size(); index++) {
                             String itemInfo = itemList.get(index);
-                            ItemStack itemStack = ItemUtil.getItemStack(itemInfo.split(":")[0]);
+                            ItemStack itemStack = ISerializer.deserializeItemStack(itemInfo.split(":")[0]);
                             if (itemStack.isSimilar(addItemStack)) {
                                 if (itemStack.getAmount() >= itemStack.getMaxStackSize()) {
                                     continue;
@@ -73,7 +73,7 @@ public class ReplenishmentInterface implements InventoryHolder, Listener {
                                     inventory.setItem(i, null);
                                 }
                                 String probability = itemInfo.split(":")[1];
-                                itemList.set(index, ItemUtil.getItemData(itemStack) + ":" + probability);
+                                itemList.set(index, ISerializer.serializerItemStack(itemStack) + ":" + probability);
                                 break;
                             }
                         }

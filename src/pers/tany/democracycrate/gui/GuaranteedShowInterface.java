@@ -16,6 +16,7 @@ import pers.tany.yukinoaapi.interfacepart.builder.IItemBuilder;
 import pers.tany.yukinoaapi.interfacepart.item.IItem;
 import pers.tany.yukinoaapi.interfacepart.other.IRandom;
 import pers.tany.yukinoaapi.interfacepart.other.IString;
+import pers.tany.yukinoaapi.interfacepart.player.IPlayer;
 import pers.tany.yukinoaapi.interfacepart.serializer.ISerializer;
 import pers.tany.yukinoaapi.realizationpart.builder.ItemBuilder;
 import pers.tany.yukinoaapi.realizationpart.item.GlassPaneUtil;
@@ -23,7 +24,7 @@ import pers.tany.yukinoaapi.realizationpart.item.GlassPaneUtil;
 import java.util.HashMap;
 import java.util.List;
 
-public class ShowInterface implements InventoryHolder, Listener {
+public class GuaranteedShowInterface implements InventoryHolder, Listener {
     private final String serial;
     private final Inventory inventory;
     private final String crateName;
@@ -34,7 +35,7 @@ public class ShowInterface implements InventoryHolder, Listener {
     private boolean hasNext;
     private final HashMap<Integer, String> SLOT_ITEM = new HashMap<>();
 
-    public ShowInterface(String crateName, Player player, int page) {
+    public GuaranteedShowInterface(String crateName, Player player, int page) {
 
         this.crateName = crateName;
         this.ownerName = CrateUtil.getOwner(crateName);
@@ -51,7 +52,7 @@ public class ShowInterface implements InventoryHolder, Listener {
     private void update(int page) {
         inventory.clear();
         SLOT_ITEM.clear();
-        List<String> itemList = CrateUtil.getItemList(crateName);
+        List<String> itemList = CrateUtil.getGuaranteedItemList(crateName);
 
         IItemBuilder frame = GlassPaneUtil.getStainedGlass(15);
         IItemBuilder last = GlassPaneUtil.getStainedGlass(11);
@@ -88,10 +89,9 @@ public class ShowInterface implements InventoryHolder, Listener {
         int size = itemList.size() - 1;
         while (index <= size && index <= 44 + (page - 1) * 45) {
             String itemInfo = itemList.get(index);
-            ItemStack itemStack = ISerializer.deserializeItemStack(itemInfo.split(":")[0]);
-            String probability = itemInfo.split(":")[1];
+            ItemStack itemStack = ISerializer.deserializeItemStack(itemInfo);
             IItemBuilder iItemBuilder = new ItemBuilder(itemStack);
-            iItemBuilder.addLore(Main.message.getString("ShowLore").replace("[probability]", probability + ""));
+            iItemBuilder.addLore(Main.message.getString("GuaranteedLore").replace("[number]", CrateUtil.getGuaranteed(crateName) + ""));
             if (player.getName().equals(ownerName)) {
 //                iItemBuilder.addLore(Main.message.getString("DeleteLore"));
             }
@@ -115,19 +115,19 @@ public class ShowInterface implements InventoryHolder, Listener {
         if (evt.getWhoClicked() instanceof Player && evt.getWhoClicked().equals(player)) {
             int rawSlot = evt.getRawSlot();
             if (rawSlot != -999) {
-                if (evt.getInventory().getHolder() instanceof ShowInterface) {
+                if (evt.getInventory().getHolder() instanceof GuaranteedShowInterface) {
                     evt.setCancelled(true);
-                    if (evt.getClickedInventory().getHolder() instanceof ShowInterface) {
+                    if (evt.getClickedInventory().getHolder() instanceof GuaranteedShowInterface) {
                         if (!IItem.isEmpty(evt.getCurrentItem())) {
                             if (player.getName().equals(ownerName) && SLOT_ITEM.containsKey(rawSlot)) {
-//                                List<String> itemList = CrateUtil.getItemList(crateName);
+//                                List<String> itemList = CrateUtil.getGuaranteedItemList(crateName);
 //                                String itemInfo = SLOT_ITEM.get(rawSlot);
 //
 //                                ItemStack itemStack = ISerializer.deserializeItemStack(itemInfo.split(":")[0]);
 //                                IPlayer.giveItem(player, itemStack);
 //
 //                                itemList.remove(itemInfo);
-//                                CrateUtil.setItemList(crateName, itemList);
+//                                CrateUtil.setGuaranteedItemList(crateName, itemList);
 //                                player.sendMessage(IString.color(Main.message.getString("DeleteSuccess")));
 
                                 update(page);
@@ -149,8 +149,8 @@ public class ShowInterface implements InventoryHolder, Listener {
 
     @EventHandler
     private void onInventoryClose(InventoryCloseEvent evt) {
-        if (evt.getInventory().getHolder() instanceof ShowInterface && evt.getPlayer() instanceof Player) {
-            ShowInterface showInterface = (ShowInterface) evt.getInventory().getHolder();
+        if (evt.getInventory().getHolder() instanceof GuaranteedShowInterface && evt.getPlayer() instanceof Player) {
+            GuaranteedShowInterface showInterface = (GuaranteedShowInterface) evt.getInventory().getHolder();
             if (evt.getPlayer().equals(player) && showInterface.getSerial().equals(serial)) {
                 HandlerList.unregisterAll(this);
             }

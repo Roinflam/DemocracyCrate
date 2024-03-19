@@ -18,9 +18,12 @@ public class CrateUtil {
         Main.data.set("Crate." + crateName + ".Enable", true);
         Main.data.set("Crate." + crateName + ".Owner", ownerName);
         Main.data.set("Crate." + crateName + ".Money", Main.config.getInt("BaseMoney"));
+        Main.data.set("Crate." + crateName + ".Guaranteed", 0);
         Main.data.set("Crate." + crateName + ".Items", new ArrayList<>());
+        Main.data.set("Crate." + crateName + ".GuaranteedItems", new ArrayList<>());
         IConfig.saveConfig(Main.plugin, Main.data, "", "data");
     }
+
 
     public static void removeCrate(String crateName) {
         Main.data.set("Crate." + crateName, null);
@@ -31,6 +34,15 @@ public class CrateUtil {
         return Main.data.getConfigurationSection("Crate." + crateName) != null;
     }
 
+    public static void setLotteryNumber(String crateName, String name, int number) {
+        Main.data.set("Guaranteed." + name + "." + crateName, number);
+        IConfig.saveConfig(Main.plugin, Main.data, "", "data");
+    }
+
+    public static int getLotteryNumber(String crateName, String name) {
+        return Main.data.getInt("Guaranteed." + name + "." + crateName);
+    }
+
     public static String getOwner(String crateName) {
         return Main.data.getString("Crate." + crateName + ".Owner");
     }
@@ -39,8 +51,17 @@ public class CrateUtil {
         return Main.data.getInt("Crate." + crateName + ".Money");
     }
 
+    public static int getGuaranteed(String crateName) {
+        return Main.data.getInt("Crate." + crateName + ".Guaranteed");
+    }
+
     public static void setMoney(String crateName, int money) {
         Main.data.set("Crate." + crateName + ".Money", money);
+        IConfig.saveConfig(Main.plugin, Main.data, "", "data");
+    }
+
+    public static void setGuaranteed(String crateName, int number) {
+        Main.data.set("Crate." + crateName + ".Guaranteed", number);
         IConfig.saveConfig(Main.plugin, Main.data, "", "data");
     }
 
@@ -57,6 +78,14 @@ public class CrateUtil {
         return Main.data.getStringList("Crate." + crateName + ".Items");
     }
 
+    public static List<String> getGuaranteedItemList(String crateName) {
+        return Main.data.getStringList("Crate." + crateName + ".GuaranteedItems");
+    }
+
+    public static void setGuaranteedItemList(String crateName, List<String> list) {
+        Main.data.set("Crate." + crateName + ".GuaranteedItems", list);
+    }
+
     public static void setItemList(String crateName, List<String> list) {
         Main.data.set("Crate." + crateName + ".Items", list);
     }
@@ -65,6 +94,12 @@ public class CrateUtil {
         List<String> list = getItemList(crateName);
         list.add(itemInfo);
         Main.data.set("Crate." + crateName + ".Items", list);
+    }
+
+    public static void addGuaranteedItem(String crateName, String itemInfo) {
+        List<String> list = getGuaranteedItemList(crateName);
+        list.add(itemInfo);
+        Main.data.set("Crate." + crateName + ".GuaranteedItems", list);
     }
 
     public static int getPlayerCrateNumber(String name) {

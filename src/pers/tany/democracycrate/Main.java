@@ -22,6 +22,7 @@ public class Main extends JavaPlugin {
     public static YamlConfiguration config;
     public static YamlConfiguration data;
     public static YamlConfiguration message;
+    public static YamlConfiguration log;
     public static Economy economy;
 
     public static HashMap<String, Hologram> holographicList = new HashMap<String, Hologram>();
@@ -44,10 +45,12 @@ public class Main extends JavaPlugin {
         IConfig.createResource(this, "", "config.yml", false);
         IConfig.createResource(this, "", "data.yml", false);
         IConfig.createResource(this, "", "message.yml", false);
+        IConfig.createResource(this, "", "log.yml", false);
 
         config = IConfig.loadConfig(this, "", "config");
         data = IConfig.loadConfig(this, "", "data");
         message = IConfig.loadConfig(this, "", "message");
+        log = IConfig.loadConfig(this, "", "log");
 
         IRegister.registerEvents(this, new Events());
         IRegister.registerCommands(this, "DemocracyCrate", new Commands());
