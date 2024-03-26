@@ -94,7 +94,9 @@ public class Commands implements CommandExecutor {
                         int guaranteed = CrateUtil.getGuaranteed(crateName);
                         int number = CrateUtil.getLotteryNumber(crateName, player.getName());
                         String owner = CrateUtil.getOwner(crateName);
-                        player.sendMessage(IString.color(Main.message.getString("LotteryNumber").replace("[owner]", owner).replace("[number]", number + "").replace("[crateName]", crateName).replace("[guaranteed]", guaranteed + "").replace("[surplus]", guaranteed - number + "")));
+                        if (owner != null) {
+                            player.sendMessage(IString.color(Main.message.getString("LotteryNumber").replace("[owner]", owner).replace("[number]", number + "").replace("[crateName]", crateName).replace("[guaranteed]", guaranteed + "").replace("[surplus]", guaranteed - number + "")));
+                        }
                     }
                 }
                 return true;
